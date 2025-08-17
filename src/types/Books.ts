@@ -18,10 +18,15 @@ type BookResponseDto = {
     bookCode: string;
     author: AuthorResponseDto;
     genre: GenreResponseDto;
-    AvailabilityStatus: string;
+    AvailabilityStatus: AvailabilityStatus;
     language: string;
     publishedYear: string;
-    bookQuality: string;
+    bookQuality: BookQuality;
 }
 
-export type { BookRequestDto, BookResponseDto };
+type BookQuality = 'GOOD' | 'NEW' | 'POOR' | 'DAMAGED';
+
+type AvailabilityStatus = 'AVAILABLE' | 'RENTED' | 'LOST' | 'DELETED';
+
+
+export type { BookRequestDto, BookResponseDto, BookQuality, AvailabilityStatus };

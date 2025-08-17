@@ -7,23 +7,21 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { BookPreviewDialog } from "@/pages/books/BookPreviewDialog";
 import type { BookResponseDto } from "@/types/Books";
-import { Delete, Pencil } from "lucide-react";
-import { Button } from "../ui/button";
+import { useState } from "react";
 
 interface BookTableProps {
   className?: string;
   books: BookResponseDto[];
 }
 export const BookTable: React.FC<BookTableProps> = ({ books, className }) => {
-  const handleDelete = (id: number) => {
-    // Placeholder for delete functionality
-    console.log(`Delete book with ID: ${id}`);
-  };
+  const [selectedBook, setSelectedBook] = useState<BookResponseDto>(
+    {} as BookResponseDto
+  );
 
-  const handleEdit = (id: number) => {
-    // Placeholder for edit functionality
-    console.log(`Edit book with ID: ${id}`);
+  const handleRowClick = (book: BookResponseDto) => {
+    setSelectedBook(book);
   };
 
   return (
@@ -33,50 +31,36 @@ export const BookTable: React.FC<BookTableProps> = ({ books, className }) => {
           <TableCaption>All books available in the system.</TableCaption>
           <TableHeader>
             <TableRow>
-              <TableHead>Book_Id</TableHead>
-              <TableHead>Title</TableHead>
-              <TableHead>Summary</TableHead>
-              <TableHead>Book_Code</TableHead>
-              <TableHead>Author</TableHead>
-              <TableHead>Genre</TableHead>
-              <TableHead>Language</TableHead>
-              <TableHead>Published_Year</TableHead>
-              <TableHead>Availablity</TableHead>
-              <TableHead className="text-right">Quality</TableHead>
-              <TableHead className="text-right"></TableHead>
-              <TableHead className="text-right"></TableHead>
+              <TableHead className="text-center">Book_Id</TableHead>
+              <TableHead className="text-center">Title</TableHead>
+              <TableHead className="text-center">Author</TableHead>
+              <TableHead className="text-center">Genre</TableHead>
+              <TableHead className="text-center">Published_Year</TableHead>
+              <TableHead className="text-center">Availablity</TableHead>
+              <TableHead className="text-center">Quality</TableHead>
+              <TableHead className="text-center">Preview</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {books.map((book) => (
-              <TableRow key={book.id}>
-                <TableCell className="font-medium text-right">
+              <TableRow key={book.id} onClick={() => handleRowClick(book)}>
+                <TableCell className="font-medium text-center">
                   {book.id}
                 </TableCell>
-                <TableCell>{book.title}</TableCell>
-                <TableCell>{book.summary}</TableCell>
-                <TableCell>{book.bookCode}</TableCell>
-                <TableCell>{book.author.name}</TableCell>
-                <TableCell>{book.genre.name}</TableCell>
-                <TableCell>{book.language}</TableCell>
-                <TableCell>{book.publishedYear}</TableCell>
-                <TableCell>{book.AvailabilityStatus}</TableCell>
-                <TableCell>{book.bookQuality}</TableCell>
-                <TableCell className="text-right">
-                  <Button
-                    className="bg-blue-500 hover:bg-blue-600 cursor-pointer"
-                    onClick={() => handleEdit(book.id)}
-                  >
-                    <Pencil width={20} height={20} />
-                  </Button>
-                </TableCell>
-                <TableCell className="text-right">
-                  <Button
-                    className="bg-red-500 hover:bg-red-600 cursor-pointer"
-                    onClick={() => handleDelete(book.id)}
-                  >
-                    <Delete width={20} height={20} />
-                  </Button>
+                <TableCell className="text-center">{book.title}</TableCell>
+                <TableCell className="text-center">{book.author.name}</TableCell>
+                <TableCell className="text-center">{book.genre.name}</TableCell>
+                <TableCell className="text-center">{book.publishedYear}</TableCell>
+                <TableCell className="text-center">{book.AvailabilityStatus}</TableCell>
+                <TableCell className="text-center">{book.bookQuality}</TableCell>
+                <TableCell className="text-center">
+                  <BookPreviewDialog
+                    book={selectedBook}
+                    onSave={() => {}}
+                    onDelete={() => {}}
+                    onStatusChange={() => {}}
+                    // key={selectedBook.id}
+                  />
                 </TableCell>
               </TableRow>
             ))}

@@ -7,7 +7,7 @@ type UserReqeustDto = {
     email: string;
     phoneNumber: string;
     address: AddressRequestDto;
-    userRole: string; // e.g., "admin", "user"
+    userRole: UserRole; // e.g., "admin", "user"
 }
 
 type UserResponseDto = {
@@ -17,8 +17,12 @@ type UserResponseDto = {
     email: string;
     phoneNumber: string;
     address: AddressResponseDto;
-    userStatus: string; // e.g., "active", "inactive"
-    userRole: string; // e.g., "admin", "user"
+    userStatus: UserStatus; // e.g., "active", "inactive"
+    userRole: UserRole; // e.g., "admin", "member"
 }
 
-export type { UserReqeustDto, UserResponseDto };
+type UserRole = "ADMIN" | "MEMBER" | "LIBRARIAN" | "GUEST";
+
+type UserStatus = "ACTIVE" | "INACTIVE" | "BANNED" | "DELETED"; 
+
+export type { UserReqeustDto, UserResponseDto, UserRole, UserStatus };

@@ -14,8 +14,10 @@ type RentalResponseDto = {
     rentalDate: string;
     expectedReturnDate: string;
     actualReturnDate?: string; // Optional, as it may not be set until the book is returned
-    rentalStatus: string; // e.g., "rented", "returned", "overdue"
+    rentalStatus: RentalStatus; // e.g., "rented", "returned", "overdue"
     totalAmount: number; // Total amount charged for the rental
 }
 
-export type { RentalRequestDto, RentalResponseDto };
+type RentalStatus = "RENTED" | "OVERDUE" | "RETURNED" | "CANCELLED";
+
+export type { RentalRequestDto, RentalResponseDto, RentalStatus };
