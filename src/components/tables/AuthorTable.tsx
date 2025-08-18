@@ -1,4 +1,4 @@
-import type { AuthorResponseDto } from "@/types/Author";
+import type { AuthorRequestDto, AuthorResponseDto } from "@/types/Author";
 import {
   Table,
   TableBody,
@@ -13,12 +13,19 @@ import { AuthorPreviewDialog } from "@/pages/books/AuthorPreviewDialog";
 interface Props {
   authors: AuthorResponseDto[];
   className?: string;
+  onUpdate: (id: number, data: AuthorRequestDto) => void;
+  onDelete: (id: number) => void;
 }
 
-export const AuthorTable: React.FC<Props> = ({ authors, className }) => {
+export const AuthorTable: React.FC<Props> = ({
+  authors,
+  className,
+  onUpdate,
+  onDelete,
+}) => {
   return (
     <div className={className || "w-full p-4"}>
-      <Table >
+      <Table>
         <TableCaption>All authors available in the system.</TableCaption>
         <TableHeader>
           <TableRow>
@@ -31,7 +38,15 @@ export const AuthorTable: React.FC<Props> = ({ authors, className }) => {
             <TableRow key={author.id}>
               <TableCell className="text-center">{author.id}</TableCell>
               <TableCell className="text-center">{author.name}</TableCell>
-              <TableCell className="text-center"><AuthorPreviewDialog author={author} /></TableCell>
+              <TableCell className="text-center">
+                <AuthorPreviewDialog
+                  author={author}
+                  onUpdate={(id: number, data: AuthorRequestDto) =>
+                    onUpdate(id, data)
+                  }
+                  onDelete={(id: number) => onDelete(id)}
+                />
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

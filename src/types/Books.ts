@@ -18,7 +18,7 @@ type BookResponseDto = {
     bookCode: string;
     author: AuthorResponseDto;
     genre: GenreResponseDto;
-    AvailabilityStatus: AvailabilityStatus;
+    availabilityStatus: AvailabilityStatus;
     language: string;
     publishedYear: string;
     bookQuality: BookQuality;

@@ -21,6 +21,7 @@ import { DialogTrigger } from "@radix-ui/react-dialog";
 import { GenreApi } from "@/api/GenreApi";
 import type { AuthorResponseDto } from "@/types/Author";
 import type { GenreResponseDto } from "@/types/Genre";
+import { toast } from "sonner";
 
 type BookRequestDto = {
   title: string;
@@ -32,8 +33,11 @@ type BookRequestDto = {
   bookQuality: string;
 };
 
+interface Props {
+  onAdd: (data: BookRequestDto) => Promise<void>;
+}
 
-export const BookForm = () => {
+export const BookForm: React.FC<Props> = ({ onAdd }) => {
   const [book, setBook] = useState<BookRequestDto>({
     title: "",
     summary: "",
@@ -44,7 +48,6 @@ export const BookForm = () => {
     bookQuality: "",
   });
 
-
   const [authors, setAuthors] = useState<AuthorResponseDto[]>([]);
   const [genres, setGenres] = useState<GenreResponseDto[]>([]);
   const [open, setOpen] = useState(false);
@@ -54,8 +57,8 @@ export const BookForm = () => {
   };
 
   const handleSubmit = () => {
-    console.log("Submitting book:", book);
-    // Here you can call your API, e.g., axios.post("/api/books", book)
+    onAdd(book);
+    setOpen(false);
   };
 
   useEffect(() => {
@@ -66,8 +69,12 @@ export const BookForm = () => {
 
   const fetchAuthors = async () => {
     try {
-      const data = await AuthorApi.getAll();
-      setAuthors(data);
+      const { data, status } = await AuthorApi.getAll();
+      if (status === 200) {
+        setAuthors(data);
+        return;
+      }
+      setAuthors([]);
     } catch (error) {
       console.error("Error fetching authors:", error);
     }
@@ -75,10 +82,19 @@ export const BookForm = () => {
 
   const fetchGenres = async () => {
     try {
-      const data = await GenreApi.getAll();
-      setGenres(data);
+      const { data, status } = await GenreApi.getAll();
+      if (status === 200) {
+        setGenres(data);
+        return;
+      }
+      setGenres([]);
     } catch (error) {
       console.error("Error fetching genres:", error);
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("An unknown error occurred.");
+      }
     }
   };
 
@@ -121,7 +137,7 @@ export const BookForm = () => {
               <Label htmlFor="author">Author</Label>
               <Select
                 onValueChange={(value) =>
-                  handleChange("authorId", Number(value))
+                  handleChange("authorId", authors.find((a) => a.name === value)?.id ?? 0)
                 }
               >
                 <SelectTrigger className="w-32">
@@ -141,9 +157,13 @@ export const BookForm = () => {
             <div className="grid gap-2">
               <Label htmlFor="genre">Genre</Label>
               <Select
-                onValueChange={(value) =>
-                  handleChange("genreId", Number(value))
-                }
+                onValueChange={(value) => {
+                  const genre = genres.find((g) => g.name === value);
+                  if (genre) {
+                    handleChange("genreId", genre.id);
+                  }
+                  
+                }}
               >
                 <SelectTrigger className="w-32">
                   <SelectValue placeholder="Select genre" />
@@ -168,9 +188,9 @@ export const BookForm = () => {
                 </SelectTrigger>
 
                 <SelectContent>
-                  <SelectItem value="New">New</SelectItem>
-                  <SelectItem value="Used">Used</SelectItem>
-                  <SelectItem value="Old">Old</SelectItem>
+                  <SelectItem value="NEW">New</SelectItem>
+                  <SelectItem value="GOOD">Good</SelectItem>
+                  <SelectItem value="POOR">Poor</SelectItem>
                 </SelectContent>
               </Select>
             </div>

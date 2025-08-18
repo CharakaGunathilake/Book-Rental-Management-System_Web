@@ -26,14 +26,14 @@ import type {
 
 type Props = {
   book: BookResponseDto;
-  onSave: (updated: BookRequestDto) => void;
+  onUpdate: (id: number, updated: BookRequestDto) => void;
   onDelete: (id: number) => void;
   onStatusChange: (id: number, status: AvailabilityStatus) => void;
 };
 
 export const BookPreviewDialog: React.FC<Props> = ({
   book,
-  onSave,
+  onUpdate,
   onDelete,
   onStatusChange,
 }) => {
@@ -44,8 +44,8 @@ export const BookPreviewDialog: React.FC<Props> = ({
     language: book.language,
     publishedYear: book.publishedYear,
     bookQuality: book.bookQuality,
-    authorId: book.author?.id??0,
-    genreId: book.genre?.id??0,
+    authorId: book.author?.id ?? 0,
+    genreId: book.genre?.id ?? 0,
   });
 
   const handleChange = (field: keyof BookRequestDto, value: unknown) => {
@@ -53,7 +53,7 @@ export const BookPreviewDialog: React.FC<Props> = ({
   };
 
   const handleSave = () => {
-    onSave(data);
+    onUpdate(book.id, data);
     setEditable(false);
   };
 
@@ -133,7 +133,7 @@ export const BookPreviewDialog: React.FC<Props> = ({
 
             <Label>Availability Status</Label>
             <Select
-              value={book.AvailabilityStatus}
+              value={book.availabilityStatus}
               onValueChange={(value) =>
                 onStatusChange(book.id, value as AvailabilityStatus)
               }
@@ -143,9 +143,9 @@ export const BookPreviewDialog: React.FC<Props> = ({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="AVAILABLE">Available</SelectItem>
-                <SelectItem value="RENTED">Rented</SelectItem> 
-                <SelectItem value="LOST">Lost</SelectItem> 
-                <SelectItem value="DELETED">Deleted</SelectItem> 
+                <SelectItem value="RENTED">Rented</SelectItem>
+                <SelectItem value="LOST">Lost</SelectItem>
+                <SelectItem value="DELETED">Deleted</SelectItem>
               </SelectContent>
             </Select>
           </div>

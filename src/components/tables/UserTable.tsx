@@ -1,4 +1,4 @@
-import type { UserResponseDto } from "@/types/Users";
+import type { UserReqeustDto, UserResponseDto } from "@/types/Users";
 import type React from "react";
 import {
   Table,
@@ -14,9 +14,16 @@ import { UserPreviewDialog } from "@/pages/users/UserPreviewDialog";
 interface Props {
   className?: string;
   users: UserResponseDto[];
+  onUpdate: (id: number, data: UserReqeustDto) => void;
+  onDelete: (id: number) => void;
 }
 
-export const UserTable: React.FC<Props> = ({ className, users }) => {
+export const UserTable: React.FC<Props> = ({
+  className,
+  users,
+  onUpdate,
+  onDelete,
+}) => {
   return (
     <div className={className || "w-full p-4"}>
       <Table>
@@ -49,7 +56,15 @@ export const UserTable: React.FC<Props> = ({ className, users }) => {
                 {user.userRole}
               </TableCell>
               <TableCell className="font-medium text-center">
-                <UserPreviewDialog user={user} />
+                <UserPreviewDialog
+                  user={user}
+                  onUpdate={(id: number, data: UserReqeustDto) => {
+                    onUpdate(id, data);
+                  }}
+                  onDelete={(id: number) => {
+                    onDelete(id);
+                  }}
+                />
               </TableCell>
             </TableRow>
           ))}

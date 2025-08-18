@@ -11,44 +11,64 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectTrigger,
-  SelectContent,
-  SelectItem,
-  SelectValue,
-} from "@/components/ui/select";
 
 import type { RentalResponseDto, RentalRequestDto } from "@/types/Rentals";
 import type { BookResponseDto } from "@/types/Books";
 import type { UserResponseDto } from "@/types/Users";
+import { UserApi } from "@/api/UserApi";
+import { toast } from "sonner";
+import { BookApi } from "@/api/BookApi";
 
 type Props = {
   rental: RentalResponseDto;
-  onUpdate?: (updated: RentalRequestDto) => void;
-  onDelete?: (id: number) => void;
-  oncancel?: (id: number) => void;
+  onUpdate: (id: number, updated: RentalRequestDto) => void;
+  onDelete: (id: number) => void;
+  onCancel: (id: number) => void;
 };
 
 export const RentalPreviewDialog: React.FC<Props> = ({
   rental,
   onUpdate,
   onDelete,
-  oncancel,
+  onCancel,
 }) => {
   const [open, setOpen] = useState(false);
   const [data, setData] = useState<RentalRequestDto>({
     bookId: rental.book.id,
     userId: rental.user.id,
-    expectedReturnDays: "",
+    expectedReturnDays: 0,
   });
-  const [books, setBooks] = useState<BookResponseDto[]>([]);
-  const [users, setUsers] = useState<UserResponseDto[]>([]);
+  const [book, setBook] = useState<BookResponseDto>({} as BookResponseDto);
+  const [user, setUser] = useState<UserResponseDto>({} as UserResponseDto);
 
   useEffect(() => {
-    setBooks([rental.book]);
-    setUsers([rental.user]);
+    fetchUser(rental.user.id);
+    fetchBook(rental.book.id);
   }, [rental]);
+
+  const fetchUser = async (userId: number) => {
+    try {
+      const { data, status } = await UserApi.getOne(userId);
+      if (status === 200) {
+        setUser(data);
+      }
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      toast.error("Error fetching user.");
+    }
+  };
+
+  const fetchBook = async (bookId: number) => {
+    try {
+      const { data, status } = await BookApi.getOne(bookId);
+      if (status === 200) {
+        setBook(data);
+      }
+    } catch (error) {
+      console.error("Error fetching book:", error);
+      toast.error("Error fetching book.");
+    }
+  };
 
   useEffect(() => {
     setData((prev) => ({
@@ -58,10 +78,8 @@ export const RentalPreviewDialog: React.FC<Props> = ({
     }));
   }, [rental]);
 
-  
-
   const handleUpdate = () => {
-    onUpdate(data);
+    onUpdate(rental.id, data);
   };
 
   const handleDelete = () => {
@@ -69,7 +87,7 @@ export const RentalPreviewDialog: React.FC<Props> = ({
   };
 
   const handleCancel = () => {
-    oncancel(rental.id);
+    onCancel(rental.id);
   };
 
   return (
@@ -82,82 +100,126 @@ export const RentalPreviewDialog: React.FC<Props> = ({
           <DialogTitle>Rental Preview</DialogTitle>
         </DialogHeader>
 
-        {/* Rental Preview Section */}
-        <div className="space-y-3 border p-3 rounded-md">
-          <p>
-            <span className="font-semibold">Rental ID:</span> {rental.id}
-          </p>
-          <p>
-            <span className="font-semibold">Rental Date:</span>{" "}
-            {rental.rentalDate}
-          </p>
-          <p>
-            <span className="font-semibold">Expected Return:</span>{" "}
-            {rental.expectedReturnDate}
-          </p>
-          <p>
-            <span className="font-semibold">Actual Return:</span>{" "}
-            {rental.actualReturnDate ?? "Not Returned"}
-          </p>
-          <p>
-            <span className="font-semibold">Status:</span> {rental.rentalStatus}
-          </p>
-          <p>
-            <span className="font-semibold">Total Amount:</span> $
-            {rental.totalAmount}
-          </p>
+        {/* Scrollable Details Section */}
+        <div className="max-h-72 overflow-y-auto border-b pb-2 mb-2 space-y-4">
+          {/* Rental Info */}
+          <div>
+            <h4 className="font-semibold text-lg">Rental Details</h4>
+            <p>
+              <span className="font-semibold">ID:</span> {rental.id}
+            </p>
+            <p>
+              <span className="font-semibold">Status:</span>{" "}
+              {rental.rentalStatus}
+            </p>
+            <p>
+              <span className="font-semibold">Rental Date:</span>{" "}
+              {rental.rentedDate}
+            </p>
+            <p>
+              <span className="font-semibold">Expected Return:</span>{" "}
+              {rental.expectedReturnDate}
+            </p>
+            <p>
+              <span className="font-semibold">Actual Return:</span>{" "}
+              {rental.actualReturnDate ?? "Not Returned"}
+            </p>
+            <p>
+              <span className="font-semibold">Total Amount:</span> $
+              {rental.totalAmount}
+            </p>
+          </div>
+
+          {/* User Info */}
+          <div>
+            <h4 className="font-semibold text-lg">User Details</h4>
+            <p>
+              <span className="font-semibold">Name:</span> {user.firstname}{" "}
+              {user.lastname}
+            </p>
+            <p>
+              <span className="font-semibold">Email:</span> {user.email}
+            </p>
+            <p>
+              <span className="font-semibold">Phone:</span> {user.phoneNumber}
+            </p>
+            <p>
+              <span className="font-semibold">Role:</span> {user.userRole}
+            </p>
+            <p>
+              <span className="font-semibold">Status:</span> {user.userStatus}
+            </p>
+          </div>
+
+          {/* Address Info */}
+          <div>
+            <h4 className="font-semibold text-lg">Address</h4>
+            <p>{user.address?.addressLine1 ?? ""}</p>
+            <p>{user.address?.addressLine2 ?? ""}</p>
+            <p>{user.address?.addressLine3 ?? ""}</p>
+            <p>{user.address?.city}</p>
+            {user.address?.postalCode && <p>{user.address.postalCode}</p>}
+          </div>
+
+          {/* Book Info */}
+          <div>
+            <h4 className="font-semibold text-lg">Book Details</h4>
+            <p>
+              <span className="font-semibold">Title:</span> {book.title}
+            </p>
+            <p>
+              <span className="font-semibold">Code:</span> {book.bookCode}
+            </p>
+            <p>
+              <span className="font-semibold">Author:</span> {book.author?.name}
+            </p>
+            <p>
+              <span className="font-semibold">Biography:</span>{" "}
+              {book.author?.biography}
+            </p>
+            <p>
+              <span className="font-semibold">Genre:</span> {book.genre?.name}
+            </p>
+            <p>
+              <span className="font-semibold">Language:</span> {book.language}
+            </p>
+            <p>
+              <span className="font-semibold">Quality:</span> {book.bookQuality}
+            </p>
+            <p>
+              <span className="font-semibold">Availability:</span>{" "}
+              {book.availabilityStatus}
+            </p>
+          </div>
         </div>
 
         {/* Editable Request Fields */}
         <div className="space-y-4 mt-4">
-          {/* Book Select */}
+            <h3 className="font-semibold text-lg">Extend Rental</h3>
           <div>
-            <Label>Select Book *</Label>
-            <Select
-              value={String(data.bookId)}
-              onValueChange={(val) => setData({ ...data, bookId: Number(val) })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Choose a book" />
-              </SelectTrigger>
-              <SelectContent>
-                {books.map((book) => (
-                  <SelectItem key={book.id} value={String(book.id)}>
-                    {book.title} ({book.bookCode})
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Label>Selected Book</Label>
+            <Input type="text" value={book.title} readOnly />
           </div>
 
-          {/* User Select */}
           <div>
-            <Label>Select User *</Label>
-            <Select
-              value={String(data.userId)}
-              onValueChange={(val) => setData({ ...data, userId: Number(val) })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Choose a user" />
-              </SelectTrigger>
-              <SelectContent>
-                {users.map((user) => (
-                  <SelectItem key={user.id} value={String(user.id)}>
-                    {user.firstname} {user.lastname} ({user.email})
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Label>User</Label>
+            <Input
+              type="text"
+            value={`${user.firstname} ${user.lastname} (ID: ${user.id})`}
+              readOnly
+            />
           </div>
 
-          {/* Expected Return Days */}
           <div>
-            <Label>Expected Return (days) *</Label>
+            <Label>
+              Expected Return (days) - Current Value:{" "}
+              {rental.expectedReturnDate} *
+            </Label>
             <Input
               type="number"
               value={data.expectedReturnDays}
               onChange={(e) =>
-                setData({ ...data, expectedReturnDays: e.target.value })
+                setData({ ...data, expectedReturnDays: Number(e.target.value) })
               }
             />
           </div>

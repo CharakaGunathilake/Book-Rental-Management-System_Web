@@ -8,14 +8,23 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { BookPreviewDialog } from "@/pages/books/BookPreviewDialog";
-import type { BookResponseDto } from "@/types/Books";
+import type { AvailabilityStatus, BookRequestDto, BookResponseDto } from "@/types/Books";
 import { useState } from "react";
 
 interface BookTableProps {
   className?: string;
   books: BookResponseDto[];
+  onDelete: (id: number) => void;
+  onUpdate: (id: number, updated: BookRequestDto) => void;
+  onStatusChange: (id: number, status: AvailabilityStatus) => void;
 }
-export const BookTable: React.FC<BookTableProps> = ({ books, className }) => {
+export const BookTable: React.FC<BookTableProps> = ({
+  books,
+  className,
+  onDelete,
+  onUpdate,
+  onStatusChange,
+}) => {
   const [selectedBook, setSelectedBook] = useState<BookResponseDto>(
     {} as BookResponseDto
   );
@@ -48,18 +57,28 @@ export const BookTable: React.FC<BookTableProps> = ({ books, className }) => {
                   {book.id}
                 </TableCell>
                 <TableCell className="text-center">{book.title}</TableCell>
-                <TableCell className="text-center">{book.author.name}</TableCell>
+                <TableCell className="text-center">
+                  {book.author.name}
+                </TableCell>
                 <TableCell className="text-center">{book.genre.name}</TableCell>
-                <TableCell className="text-center">{book.publishedYear}</TableCell>
-                <TableCell className="text-center">{book.AvailabilityStatus}</TableCell>
-                <TableCell className="text-center">{book.bookQuality}</TableCell>
+                <TableCell className="text-center">
+                  {book.publishedYear}
+                </TableCell>
+                <TableCell className="text-center">
+                  {book.availabilityStatus}
+                </TableCell>
+                <TableCell className="text-center">
+                  {book.bookQuality}
+                </TableCell>
                 <TableCell className="text-center">
                   <BookPreviewDialog
                     book={selectedBook}
-                    onSave={() => {}}
-                    onDelete={() => {}}
-                    onStatusChange={() => {}}
-                    // key={selectedBook.id}
+                    onUpdate={(id: number, updated: BookRequestDto) => {
+                      onUpdate(id, updated);
+                    }}
+                    onDelete={(id: number) => {onDelete(id)}}
+                    onStatusChange={(id: number, status: AvailabilityStatus) => {onStatusChange(id, status)}}
+                    key={selectedBook.id}
                   />
                 </TableCell>
               </TableRow>

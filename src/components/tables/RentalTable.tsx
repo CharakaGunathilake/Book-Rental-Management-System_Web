@@ -1,4 +1,4 @@
-import type { RentalResponseDto } from "@/types/Rentals";
+import type { RentalRequestDto, RentalResponseDto } from "@/types/Rentals";
 import {
   Table,
   TableBody,
@@ -13,10 +13,16 @@ import { RentalPreviewDialog } from "@/pages/rentals/RentalPreviewDialog";
 interface RentalTableProps {
   rentals: RentalResponseDto[];
   className?: string;
+  onUpdate: (id: number, updated: RentalRequestDto) => void;
+  onDelete: (id: number) => void;
+  onCancel: (id: number) => void;
 }
 export const RentalTable: React.FC<RentalTableProps> = ({
   rentals,
   className,
+  onUpdate,
+  onDelete,
+  onCancel,
 }) => {
   return (
     <div className={className || "w-full p-4"}>
@@ -45,7 +51,7 @@ export const RentalTable: React.FC<RentalTableProps> = ({
                 {rental.user.id}
               </TableCell>
               <TableCell className="font-medium text-center">
-                {rental.rentalDate}
+                {rental.rentedDate}
               </TableCell>
               <TableCell className="font-medium text-center">
                 {rental.rentalStatus}
@@ -54,7 +60,18 @@ export const RentalTable: React.FC<RentalTableProps> = ({
                 {rental.totalAmount}
               </TableCell>
               <TableCell className="font-medium text-center">
-                <RentalPreviewDialog rental={rental} />
+                <RentalPreviewDialog
+                  rental={rental}
+                  onUpdate={(id: number, data: RentalRequestDto) => {
+                    onUpdate(id, data);
+                  }}
+                  onDelete={(id: number) => {
+                    onDelete(id);
+                  }}
+                  onCancel={(id: number) => {
+                    onCancel(id);
+                  }}
+                />
               </TableCell>
             </TableRow>
           ))}

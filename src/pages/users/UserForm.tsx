@@ -20,7 +20,7 @@ import {
 import type { UserReqeustDto, UserRole } from "@/types/Users";
 
 type Props = {
-  onAdd?: (data: UserReqeustDto) => Promise<void>;
+  onAdd: (data: UserReqeustDto) => void;
 };
 
 export const UserForm: React.FC<Props> = ({ onAdd }) => {
@@ -32,7 +32,12 @@ export const UserForm: React.FC<Props> = ({ onAdd }) => {
     phoneNumber: "",
     password: "",
     userRole: "MEMBER",
-    address: { addressLine1: "", city: "" },
+    address: {
+      addressLine1: "",
+      addressLine2: "",
+      addressLine3: "",
+      city: "",
+    },
   });
 
   const handleSubmit = async () => {
@@ -44,7 +49,7 @@ export const UserForm: React.FC<Props> = ({ onAdd }) => {
       !user.address.city
     )
       return;
-    await onAdd(user);
+    onAdd(user);
     setUser({
       firstname: "",
       lastname: "",
@@ -99,6 +104,26 @@ export const UserForm: React.FC<Props> = ({ onAdd }) => {
               setUser({
                 ...user,
                 address: { ...user.address, addressLine1: e.target.value },
+              })
+            }
+          />
+          <Input
+            placeholder="Address Line 2"
+            value={user.address.addressLine2}
+            onChange={(e) =>
+              setUser({
+                ...user,
+                address: { ...user.address, addressLine2: e.target.value },
+              })
+            }
+          />
+          <Input
+            placeholder="Address Line 3"
+            value={user.address.addressLine3}
+            onChange={(e) =>
+              setUser({
+                ...user,
+                address: { ...user.address, addressLine3: e.target.value },
               })
             }
           />

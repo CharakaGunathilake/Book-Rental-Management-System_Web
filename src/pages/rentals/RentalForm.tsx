@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -21,53 +21,49 @@ import {
 } from "@/components/ui/select";
 
 // Dummy data (replace with API later)
-import dummyRentals from "@/types/DummData"; 
 import type { BookResponseDto } from "@/types/Books";
-import type { RentalRequestDto } from "@/types/Rentals";
 import type { UserResponseDto, UserReqeustDto, UserRole } from "@/types/Users";
 
-const dummyBooks: BookResponseDto[] = dummyRentals.map((r) => r.book);
-const dummyUsers: UserResponseDto[] = dummyRentals.map((r) => r.user);
+interface Props {
+  setBookId: React.Dispatch<React.SetStateAction<number | null>>;
+  setUserId: React.Dispatch<React.SetStateAction<number | null>>;
+  expectedReturnDays: number;
+  setExpectedReturnDays: React.Dispatch<React.SetStateAction<number>>;
+  addNewUser: boolean;
+  setAddNewUser: React.Dispatch<React.SetStateAction<boolean>>;
+  newUser: UserReqeustDto;
+  setNewUser: React.Dispatch<React.SetStateAction<UserReqeustDto>>;
+  loading: boolean;
+  handleSubmit: () => void;
+  users: UserResponseDto[];
+  books: BookResponseDto[];
+}
 
-export const RentalForm: React.FC = () => {
+export const RentalForm: React.FC<Props> = ({
+  setBookId,
+  setUserId,
+  expectedReturnDays,
+  setExpectedReturnDays,
+  addNewUser,
+  setAddNewUser,
+  newUser,
+  setNewUser,
+  loading,
+  handleSubmit,
+  users,
+  books,
+}) => {
   const [open, setOpen] = useState(false);
-  const [bookId, setBookId] = useState<number | null>(null);
-  const [userId, setUserId] = useState<number | null>(null);
-  const [expectedReturnDays, setExpectedReturnDays] = useState("");
-
-  // State for new user
-  const [addNewUser, setAddNewUser] = useState(false);
-  const [newUser, setNewUser] = useState<UserReqeustDto>({
-    firstname: "",
-    lastname: "",
-    email: "",
-    phoneNumber: "",
-    userRole: "MEMBER",
-    address: { addressLine1: "", city: "" },
-  });
-
-  const handleSubmit = () => {
-    if (addNewUser) {
-      console.log("Creating new user:", newUser);
-      // API call to create user -> get new userId
-    }
-
-    if (bookId && (userId || addNewUser)) {
-      const rental: RentalRequestDto = {
-        bookId,
-        userId: userId ?? 999, // replace with new user id from API
-        expectedReturnDays,
-      };
-      console.log("Submitting rental:", rental);
-      // API call here
-    }
-    setOpen(false);
-  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button onClick={() => setOpen(true)} className="bg-green-500 hover:bg-green-600">New Rental</Button>
+        <Button
+          onClick={() => setOpen(true)}
+          className="bg-green-500 hover:bg-green-600"
+        >
+          New Rental
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
@@ -82,11 +78,13 @@ export const RentalForm: React.FC = () => {
               <SelectValue placeholder="Choose a book" />
             </SelectTrigger>
             <SelectContent>
-              {dummyBooks.map((book) => (
-                <SelectItem key={book.id} value={String(book.id)}>
-                  {book.title} ({book.bookCode})
-                </SelectItem>
-              ))}
+              {books
+                .filter((book) => book.availabilityStatus !== "RENTED" && book.availabilityStatus !== "LOST")
+                .map((book) => (
+                  <SelectItem key={book.id} value={String(book.id)}>
+                    {book.title} ({book.bookCode})
+                  </SelectItem>
+                ))}
             </SelectContent>
           </Select>
         </div>
@@ -100,7 +98,7 @@ export const RentalForm: React.FC = () => {
                 <SelectValue placeholder="Choose a user" />
               </SelectTrigger>
               <SelectContent>
-                {dummyUsers.map((user) => (
+                {users.map((user) => (
                   <SelectItem key={user.id} value={String(user.id)}>
                     {user.firstname} {user.lastname} ({user.email})
                   </SelectItem>
@@ -235,7 +233,7 @@ export const RentalForm: React.FC = () => {
                 Cancel
               </Button>
               <Button size="sm" onClick={handleSubmit}>
-                Save User & Continue
+                {loading ? "Saving..." : "Save User & Continue"}
               </Button>
             </div>
           </div>
@@ -247,7 +245,7 @@ export const RentalForm: React.FC = () => {
           <Input
             type="number"
             value={expectedReturnDays}
-            onChange={(e) => setExpectedReturnDays(e.target.value)}
+            onChange={(e) => setExpectedReturnDays(Number(e.target.value))}
           />
         </div>
 

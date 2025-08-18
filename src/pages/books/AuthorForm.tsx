@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import type { AuthorRequestDto } from "@/types/Author";
 
 type Props = {
-  onAdd?: (data: AuthorRequestDto) => Promise<void>;
+  onAdd: (data: AuthorRequestDto) => Promise<void>;
 };
 
 export const AuthorForm: React.FC<Props> = ({ onAdd }) => {

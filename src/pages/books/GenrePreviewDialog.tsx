@@ -15,8 +15,8 @@ import type { GenreRequestDto, GenreResponseDto } from "@/types/Genre";
 
 type Props = {
   genre: GenreResponseDto;
-  onUpdate?: (id: number, data: GenreRequestDto) => Promise<void>;
-  onDelete?: (id: number) => Promise<void>;
+  onUpdate: (id: number, data: GenreRequestDto) => void;
+  onDelete: (id: number) => void;
 };
 
 export const GenrePreviewDialog: React.FC<Props> = ({
@@ -30,12 +30,12 @@ export const GenrePreviewDialog: React.FC<Props> = ({
   });
 
   const handleUpdate = async () => {
-    await onUpdate(genre.id, editData);
+    onUpdate(genre.id, editData);
     setOpen(false);
   };
 
   const handleDelete = async () => {
-    await onDelete(genre.id);
+    onDelete(genre.id);
     setOpen(false);
   };
 

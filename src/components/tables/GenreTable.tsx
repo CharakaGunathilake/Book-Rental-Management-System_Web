@@ -1,4 +1,4 @@
-import type { GenreResponseDto } from "@/types/Genre";
+import type { GenreRequestDto, GenreResponseDto } from "@/types/Genre";
 import {
   Table,
   TableBody,
@@ -13,8 +13,15 @@ import { GenrePreviewDialog } from "@/pages/books/GenrePreviewDialog";
 interface Props {
   genres: GenreResponseDto[];
   className?: string;
+  onUpdate: (id: number, data: GenreRequestDto) => void;
+  onDelete: (id: number) => void;
 }
-export const GenreTable: React.FC<Props> = ({ genres, className }) => {
+export const GenreTable: React.FC<Props> = ({
+  genres,
+  className,
+  onUpdate,
+  onDelete,
+}) => {
   return (
     <div className={className || "w-full p-4"}>
       <Table>
@@ -35,7 +42,13 @@ export const GenreTable: React.FC<Props> = ({ genres, className }) => {
                 {genre.name}
               </TableCell>
               <TableCell className="font-medium text-center">
-                <GenrePreviewDialog genre={genre} />
+                <GenrePreviewDialog
+                  genre={genre}
+                  onUpdate={(id: number, data: GenreRequestDto) =>
+                    onUpdate(id, data)
+                  }
+                  onDelete={(id: number) => onDelete(id)}
+                />
               </TableCell>
             </TableRow>
           ))}

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -11,7 +11,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
+import { RentalApi } from "@/api/RentalApi";
+import { toast } from "sonner";
 
 export const RentalReturnDialog = () => {
   const [open, setOpen] = useState(false);
@@ -24,10 +25,20 @@ export const RentalReturnDialog = () => {
     if (!rentalId || !returnDate) return;
     setLoading(true);
     try {
-      // const price = await onCalculatePrice(rentalId, returnDate);
-      // setCalculatedPrice(price);
+      const { data, status } = await RentalApi.calculateTotalAmount(
+        rentalId,
+        returnDate
+      );
+      if (status === 200) {
+        setCalculatedPrice(data);
+        toast.success("Rental fee calculated successfully");
+        return;
+      }
+      setCalculatedPrice(null);
     } catch (err) {
       console.error("Error calculating price:", err);
+      toast.error("Error calculating price");
+      setCalculatedPrice(null);
     } finally {
       setLoading(false);
     }
@@ -37,13 +48,17 @@ export const RentalReturnDialog = () => {
     if (!rentalId || !returnDate) return;
     setLoading(true);
     try {
-      // await onReturn(rentalId, returnDate);
+      const {status} = await RentalApi.returnBook(rentalId);
+      if(status === 200){
+        toast.success("Book returned successfully");
+      }
       setOpen(false);
       setRentalId(null);
       setReturnDate("");
       setCalculatedPrice(null);
     } catch (err) {
       console.error("Error processing return:", err);
+      toast.error("Error processing return");
     } finally {
       setLoading(false);
     }

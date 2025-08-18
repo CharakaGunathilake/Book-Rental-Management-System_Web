@@ -15,8 +15,8 @@ import type { AuthorRequestDto, AuthorResponseDto } from "@/types/Author";
 
 type Props = {
   author: AuthorResponseDto;
-  onUpdate?: (id: number, data: AuthorRequestDto) => Promise<void>;
-  onDelete?: (id: number) => Promise<void>;
+  onUpdate: (id: number, data: AuthorRequestDto) => void;
+  onDelete: (id: number) => void;
 };
 
 export const AuthorPreviewDialog: React.FC<Props> = ({
@@ -31,12 +31,12 @@ export const AuthorPreviewDialog: React.FC<Props> = ({
   });
 
   const handleUpdate = async () => {
-    await onUpdate(author.id, editData);
+    onUpdate(author.id, editData);
     setOpen(false);
   };
 
   const handleDelete = async () => {
-    await onDelete(author.id);
+    onDelete(author.id);
     setOpen(false);
   };
 

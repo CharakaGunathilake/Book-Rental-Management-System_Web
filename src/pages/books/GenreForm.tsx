@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import type { GenreRequestDto } from "@/types/Genre";
 
 type Props = {
-  onAdd?: (data: GenreRequestDto) => Promise<void>;
+  onAdd: (data: GenreRequestDto) => Promise<void>;
 };
 
 export const GenreForm: React.FC<Props> = ({ onAdd }) => {

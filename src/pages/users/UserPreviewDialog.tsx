@@ -15,8 +15,8 @@ import type { UserResponseDto, UserReqeustDto, UserRole } from "@/types/Users";
 
 type Props = {
   user: UserResponseDto;
-  onUpdate?: (id: number, data: UserReqeustDto) => Promise<void>;
-  onDelete?: (id: number) => Promise<void>;
+  onUpdate: (id: number, data: UserReqeustDto) => void;
+  onDelete: (id: number) => void;
 };
 
 export const UserPreviewDialog: React.FC<Props> = ({ user, onUpdate, onDelete }) => {
@@ -32,12 +32,12 @@ export const UserPreviewDialog: React.FC<Props> = ({ user, onUpdate, onDelete })
   });
 
   const handleUpdate = async () => {
-    await onUpdate(user.id, editData);
+    onUpdate(user.id, editData);
     setOpen(false);
   };
 
   const handleDelete = async () => {
-    await onDelete(user.id);
+    onDelete(user.id);
     setOpen(false);
   };
 

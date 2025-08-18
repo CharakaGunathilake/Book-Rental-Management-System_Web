@@ -4,14 +4,14 @@ import type { UserResponseDto } from "./Users";
 type RentalRequestDto = {
     bookId: number;
     userId: number;
-    expectedReturnDays: string;
+    expectedReturnDays: number;
 }
 
 type RentalResponseDto = {
     id: number;
     book: BookResponseDto;
     user: UserResponseDto;
-    rentalDate: string;
+    rentedDate: string;
     expectedReturnDate: string;
     actualReturnDate?: string; // Optional, as it may not be set until the book is returned
     rentalStatus: RentalStatus; // e.g., "rented", "returned", "overdue"
